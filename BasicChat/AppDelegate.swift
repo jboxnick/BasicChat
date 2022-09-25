@@ -12,6 +12,8 @@ import Firebase
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
+    //MARK: - Properties
+    
     ///The shared AppDelegate
     static let sharedAppDelegate: AppDelegate = {
         guard let delegate = UIApplication.shared.delegate as? AppDelegate else {
@@ -20,11 +22,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return delegate
     }()
     
-    //MARK: - Properties
-    
-    
-    
-    
+    //MARK: - App Life Cyle
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.

@@ -6,8 +6,9 @@
 //
 
 import UIKit
-//import FirebaseAuth
-//import FirebaseFirestore
+import FirebaseAuth
+import FirebaseFirestore
+import FirebaseDatabase
 
 final class AppController {
     
@@ -57,23 +58,89 @@ final class AppController {
         self.window = window
         window.backgroundColor = .white
         
-        updateRootVC()
-        
-        window.makeKeyAndVisible()
+        Auth.auth().signInAnonymously { authresult, error in
+            
+            if let err = error {
+                UserDefaults.standard.set(false, forKey: "loginState")
+                print(err.localizedDescription)
+                self.updateRootVC()
+                return
+            }
+            
+            UserDefaults.standard.set(true, forKey: "loginState")
+            let userID = authresult!.user.uid
+            Database.database(url: Constants.Firebase.databaseURL).reference().child("user_sessions").updateChildValues([userID : true])
+            print("Der User mit der UID: \(authresult!.user.uid) ist erfolgreich eingeloggt")
+            
+            let currentDate = Date()
+            UserDefaults.standard.set(currentDate, forKey: "lastActiveDate")
+            print("Saved \(currentDate) for key: lastActiveDate")
+            Firestore.firestore().users.document(authresult!.user.uid).updateData(["lastActiveDate" : currentDate])
+            
+            self.updateRootVC()
+            
+            window.makeKeyAndVisible()
+        }
     }
     
     func updateRootVC() {
         
+        let userDefaults = UserDefaults.standard
+        
+        let status = userDefaults.bool(forKey: "loginState")
         var rootVC : UIViewController?
-        rootVC = MainTabBarController()
+        
+        if(status == true) {
+            
+            guard let userID = Auth.auth().currentUser?.uid else {
+                
+                AuthenticationService.logoutUser()
+                return
+            }
+            
+            // There is an user logged in
+            // Check whether the user is saved to UserDefaults
+            do {
+                let user = try userDefaults.getObject(forKey: userID, castTo: User.self)
+                UserSystem.shared.user = user
+                print("The user was loaded out of UserDefaults.")
+            } catch {
+                print(error.localizedDescription)
+                UserSystem.shared.getCurrentUser { user in
+                    print("The user was downloaded: \(user)")
+                    UserSystem.shared.user = user
+                    do {
+                        try userDefaults.setObject(user, forKey: userID)
+                        print("User was added to UserDefaults.")
+                    } catch {
+                        print(error.localizedDescription)
+                        print("Not able to add the user to UserDefaults.")
+                    }
+                }
+            }
+            rootVC = MainTabBarController()
+            
+            // Register for push notifications
+            
+//            guard let currentUserID = Auth.auth().currentUser?.uid else { return }
+//
+//            let pushManager = PushNotificationManager(userID: currentUserID)
+//            pushManager.registerForPushNotifications()
+            
+        } else {
+            
+            // There is currently no user logged in
+            UserSystem.shared.removeAllObservers()
+            ConversationSystem.shared.removeAllObservers()
+            
+            rootVC = UINavigationController(rootViewController: UIViewController())
+        }
         self.rootViewController = rootVC
     }
     
     // MARK: - Notifications
     
-    @objc internal func userDefaultsDidChange() {
-        print(#function)
-    }
+    @objc internal func userDefaultsDidChange() {}
     
     @objc internal func contextObjectsDidChange(_ notification: Notification) {
         print(#function)

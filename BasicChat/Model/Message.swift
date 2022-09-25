@@ -9,7 +9,7 @@ import Foundation
 import FirebaseFirestore
 import FirebaseAuth
 
-class Message {
+class Message: Codable {
     
     //MARK: - Properties
     
@@ -40,6 +40,12 @@ class Message {
     ///Unique identifier for each message
     let messageID: String
     
+    ///Message relationship to conversation
+    let conversationID: String
+    
+    
+    //   var messageIsReadFrom: [String]
+    
     //MARK: - Helper
     
     var dateString: String {
@@ -52,13 +58,14 @@ class Message {
     //MARK: - Initializer
     
     //Full message
-    internal init(messageText: String, receiverID: String, senderID: String, sentDate: Date, user: User? = nil) {
+    internal init(messageText: String, receiverID: String, senderID: String, sentDate: Date, user: User? = nil, conversationID: String) {
         self.messageText = messageText
         self.receiverID = receiverID
         self.senderID = senderID
         self.sentDate = sentDate
         self.user = user
         self.messageID = UUID().uuidString
+        self.conversationID = conversationID
     }
     
     internal init(dictionary: [String: Any]) {
@@ -95,15 +102,21 @@ class Message {
         } else {
             self.messageID = UUID().uuidString
         }
+        
+        if let conversationID = data["conversationID"] as? String {
+            self.conversationID = conversationID
+        } else {
+            self.conversationID = UUID().uuidString
+        }
     }
     
     //MARK: - Firebase Initializer
     
     ///Initializer for Firebase
     init?(document: QueryDocumentSnapshot) {
-
+        
         let data = document.data()
-
+        
         if let messageText = data["messageText"] as? String {
             self.messageText = messageText
         } else {
@@ -134,6 +147,12 @@ class Message {
         } else {
             self.messageID = UUID().uuidString
         }
+        
+        if let conversationID = data["conversationID"] as? String {
+            self.conversationID = conversationID
+        } else {
+            self.conversationID = UUID().uuidString
+        }
     }
 }
 
@@ -142,7 +161,7 @@ class Message {
 extension Message: DataRepresentation {
     
     var representation: [String : Any] {
-        let rep = ["messageText": messageText, "receiverID": receiverID, "senderID": senderID, "sentDate": sentDate, "messageID": messageID] as [String : Any]
+        let rep = ["messageText": messageText, "receiverID": receiverID, "senderID": senderID, "sentDate": sentDate, "messageID": messageID, "conversationID": conversationID] as [String : Any]
         
         return rep
     }

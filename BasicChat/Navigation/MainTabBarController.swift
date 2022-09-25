@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import FirebaseAuth
 
 class MainTabBarController: UITabBarController {
     
@@ -30,6 +31,22 @@ class MainTabBarController: UITabBarController {
              
         setupViews()
         delegate = self
+                
+        ConversationSystem.shared.addConversationsObserver {
+            //
+        }
+        
+        UserSystem.shared.addUserSessionListener { valid in
+            //
+        }
+        
+        UserSystem.shared.addCurrentUserListener {
+            //
+        }
+        
+        UserSystem.shared.addUsersObserver {
+            //
+        }
     }
 
     
@@ -53,7 +70,7 @@ class MainTabBarController: UITabBarController {
     //MARK: - Navigation
     
     deinit {
-        
+        ConversationSystem.shared.removeAllObservers()
         print("Deinit complete: \(self)")
     }
 }
