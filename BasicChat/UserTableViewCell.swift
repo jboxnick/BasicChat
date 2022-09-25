@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Kingfisher
 
 class UserTableViewCell: UITableViewCell {
     
@@ -64,6 +65,13 @@ class UserTableViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        profilePictureImageView.image = nil
+        profilePictureImageView.kf.cancelDownloadTask()
+    }
+    
     
     // MARK: - Setup Functions
     
@@ -77,5 +85,7 @@ class UserTableViewCell: UITableViewCell {
         ///Profilbild übergeben vom jeweilgen User
 //        guard let url = URL(string: user.profilImageUrl) else { return }
 //        profileImageView.sd_setImage(with: url)
+        profilePictureImageView.kf.indicatorType = .activity
+        profilePictureImageView.kf.setImage(with: URL(string: user.profilePictureURL ?? Constants.Others.defaultProfilePictureURL))
     }
 }

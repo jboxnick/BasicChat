@@ -74,15 +74,10 @@ class NewMessageViewController: UITableViewController {
     
     @objc func handleDismiss() {
         
-        ///Gehe wieder zurück zum vorhergende Controller
-        ///
-        ///
-        ///
-        ///
         self.navigationController?.popViewController(animated: true)
-//        dismiss(animated: true, completion: nil)
     }
 }
+
 //MARK: - UITableViewDataSource + UITableViewDelegate
 
 extension NewMessageViewController {

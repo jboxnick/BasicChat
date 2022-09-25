@@ -26,13 +26,17 @@ class User: Codable {
     ///The users email adress.
     let emailAdress: String
     
+    ///The reference to the users profile picture.
+    let profilePictureURL: String?
+    
     //MARK: - Initializer
     
     //Full user
-    internal init(userID: String, username: String, emailAdress: String) {
+    internal init(userID: String, username: String, emailAdress: String, profilePictureURL: String?) {
         self.userID = userID
         self.username = username
         self.emailAdress = emailAdress
+        self.profilePictureURL = profilePictureURL
     }
     
     internal init(dictionary: [String: Any]) {
@@ -55,6 +59,12 @@ class User: Codable {
             self.emailAdress = emailAdress
         } else {
             self.emailAdress = "Error @emailAdress"
+        }
+        
+        if let profilePictureURL = data["profilePictureURL"] as? String {
+            self.profilePictureURL = profilePictureURL
+        } else {
+            self.profilePictureURL = Constants.Others.defaultProfilePictureURL
         }
     }
     
@@ -82,6 +92,12 @@ class User: Codable {
         } else {
             self.emailAdress = "Error @emailAdress"
         }
+        
+        if let profilePictureURL = data["profilePictureURL"] as? String {
+            self.profilePictureURL = profilePictureURL
+        } else {
+            self.profilePictureURL = Constants.Others.defaultProfilePictureURL
+        }
     }
 }
 
@@ -90,7 +106,7 @@ class User: Codable {
 extension User: DataRepresentation {
     
     var representation: [String : Any] {
-        let rep = ["userID": userID, "username": username, "emailAdress": emailAdress] as [String : Any]
+        let rep = ["userID": userID, "username": username, "emailAdress": emailAdress, "profilePictureURL": profilePictureURL ?? Constants.Others.defaultProfilePictureURL] as [String : Any]
         
         return rep
     }

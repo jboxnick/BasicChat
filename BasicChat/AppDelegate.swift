@@ -8,6 +8,7 @@
 import UIKit
 import CoreData
 import Firebase
+import Kingfisher
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -25,10 +26,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     //MARK: - App Life Cyle
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
         
         //Configure Firebase
         FirebaseApp.configure()
+        
+        //Configure Kingfisher's Cache
+        let cache = ImageCache.default
+        
+        //Constrain Memory Cache to 500 MB
+        cache.memoryStorage.config.totalCostLimit = 1024 * 1024 * 500
+        
+        //Constrain Disk Cache to 1 GB
+        cache.diskStorage.config.sizeLimit = 1024 * 1024 * 1000
+        
+        //Memory storage expires after 10 minutes.
+        cache.memoryStorage.config.expiration = .seconds(600)
+        
+        //Disk storage expires after 7 days.
+        cache.diskStorage.config.expiration = .days(7)
         
         //Show Initial View
         AppController.shared.showInitialView(window: UIWindow(frame: UIScreen.main.bounds))

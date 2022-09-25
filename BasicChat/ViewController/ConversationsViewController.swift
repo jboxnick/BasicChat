@@ -60,7 +60,7 @@ class ConversationsViewController: UIViewController {
                     let secondTextField = alertController.textFields![1] as UITextField
                     guard let secondText = secondTextField.text else { return }
                     
-                    let newUser = User(userID: Auth.auth().currentUser?.uid ?? UUID().uuidString, username: firstText, emailAdress: secondText)
+                    let newUser = User(userID: Auth.auth().currentUser?.uid ?? UUID().uuidString, username: firstText, emailAdress: secondText, profilePictureURL: nil)
                     
                            
                     Firestore.firestore().add(user: newUser) {}
